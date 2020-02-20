@@ -90,6 +90,36 @@ defmodule ElixirSdetExerciseTest do
     end
 
   end
+  
+  
+   @tag password: true
+  test "signup with invalid password" do
+    #Arrange
+    invalid_values=["@","","1a"]
+    Enum.each invalid_values ,fn value ->
+    #Navigate to facebook register page and fill valid input
+    Hound.start_session
+    navigate()
+    form =find_element(:xpath, ~s|//*[@id="reg" or @name="reg" ]| ,3) 
+    fill_form(form)
+
+   #refill with invalid value
+   find_within_element(form, :id, "u_0_w") |> fill_field(value) #input password
+   :timer.sleep(3000)
+   #Act
+   find_within_element(form,:id, "u_0_13") |> click() #click register
+   #Assert
+     try do
+        assert page_title() == "facebook -Log in or Sign up"
+     rescue
+       _  -> IO.puts "Taking screen shot*********"
+          take_screenshot()
+     
+    end
+   Hound.end_session
+   end
+ end
+ 
    defp navigate() do
     navigate_to("https://facebook.com",5)
     IO.puts page_title()
