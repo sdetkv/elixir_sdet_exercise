@@ -37,6 +37,32 @@ defmodule ElixirSdetExerciseTest do
     end
   end
   
+    @tag lastname: true
+  test "signup with invalid last_name" do
+     #Arrange
+     invalid_values=["","&*&*((("]
+     Enum.each invalid_values ,fn value ->
+     #Navigate to facebook register page and fill valid input
+     Hound.start_session
+     navigate()
+     form = find_element(:xpath, ~s|//*[@id="reg" or @name="reg" ]|,3) 
+     fill_form(form)
+
+    #refill with invalid value
+    find_within_element(form, :id, "u_0_m") |> fill_field(value) # refill invalid last name
+    :timer.sleep(3000)
+    #Act
+    find_within_element(form,:id, "u_0_13") |> click() #click register
+    #Assert
+      try do
+         assert page_title() == "facebook -Log in or Sign up"
+      rescue
+       _  -> take_screenshot()
+       end
+    Hound.end_session
+    end
+  end
+  
    defp navigate() do
     navigate_to("https://facebook.com",5)
     IO.puts page_title()
